@@ -109,7 +109,7 @@ public class Worksheet implements Closeable {
 
     final Comments comments = new Comments();
 
-    final Map<String,Table> tables = new LinkedHashMap<>();
+    final Map<String, Table> tables = new LinkedHashMap<>();
 
     private final DynamicBitMatrix tablesMatrix = new DynamicBitMatrix(MAX_COLS, MAX_ROWS);
 
@@ -174,7 +174,7 @@ public class Worksheet implements Closeable {
     /**
      * Whether to use the firstPageNumber in the print setup.
      */
-    private Boolean useFirstPageNumber=false;
+    private Boolean useFirstPageNumber = false;
     /**
      * Black and white mode in the print setup.
      */
@@ -256,7 +256,7 @@ public class Worksheet implements Closeable {
      * Constructor.
      *
      * @param workbook Parent workbook.
-     * @param name Worksheet name.
+     * @param name     Worksheet name.
      */
     Worksheet(Workbook workbook, String name) {
         this.workbook = Objects.requireNonNull(workbook);
@@ -276,9 +276,9 @@ public class Worksheet implements Closeable {
      * Get repeating rows defined for the print setup.
      *
      * @return List representing a range of rows to be repeated
-     *              on each page when printing.
+     * on each page when printing.
      */
-    public RepeatRowRange getRepeatingRows(){
+    public RepeatRowRange getRepeatingRows() {
         return repeatingRows;
     }
 
@@ -286,9 +286,9 @@ public class Worksheet implements Closeable {
      * Get cell range that autofilter is applied to.
      *
      * @return Range of cells that autofilter is set to
-     *             (null if autofilter is not set).
+     * (null if autofilter is not set).
      */
-    public Range getAutoFilterRange(){
+    public Range getAutoFilterRange() {
         return autoFilterRange;
     }
 
@@ -296,9 +296,9 @@ public class Worksheet implements Closeable {
      * Get repeating cols defined for the print setup.
      *
      * @return List representing a range of columns to be repeated
-     *              on each page when printing.
+     * on each page when printing.
      */
-    public RepeatColRange getRepeatingCols(){
+    public RepeatColRange getRepeatingCols() {
         return repeatingCols;
     }
 
@@ -306,7 +306,7 @@ public class Worksheet implements Closeable {
      * Get a list of named ranges.
      *
      * @return Map containing named range entries
-     *              where keys are the names and values are cell ranges.
+     * where keys are the names and values are cell ranges.
      */
     public Map<String, Range> getNamedRanges() {
         return namedRanges;
@@ -331,7 +331,8 @@ public class Worksheet implements Closeable {
     Cell cell(int r, int c) {
         // Check limits
         if (r < 0 || r >= MAX_ROWS || c < 0 || c >= MAX_COLS) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(String.format("Cell coordinate (%d,%d) out of range. " +
+                    "Required: (0,0) <= (row,column) < (%d,%d).", r, c, MAX_ROWS, MAX_COLS));
         }
         flushedCheck(r);
 
@@ -358,7 +359,7 @@ public class Worksheet implements Closeable {
     }
 
     private void flushedCheck(int r) {
-        if(r < flushedRows){
+        if (r < flushedRows) {
             throw new IllegalStateException("Row " + r + " already flushed from memory.");
         }
     }
@@ -369,12 +370,12 @@ public class Worksheet implements Closeable {
      * @param range Range of cells.
      */
     void merge(Range range) {
-        if (!mergedMatrix.isConflict(range.getTop(),range.getLeft(),range.getBottom(),range.getRight())){
+        if (!mergedMatrix.isConflict(range.getTop(), range.getLeft(), range.getBottom(), range.getRight())) {
             if (mergedRanges.add(range)) {
-                mergedMatrix.setRegion(range.getTop(),range.getLeft(),range.getBottom(),range.getRight());
+                mergedMatrix.setRegion(range.getTop(), range.getLeft(), range.getBottom(), range.getRight());
             }
-        }else {
-            throw new IllegalArgumentException("Merge conflicted:" +range);
+        } else {
+            throw new IllegalArgumentException("Merge conflicted:" + range);
         }
     }
 
@@ -382,16 +383,17 @@ public class Worksheet implements Closeable {
      * Apply shading to alternate rows in the given range.
      *
      * @param range Range of cells.
-     * @param fill Shading fill pattern.
+     * @param fill  Shading fill pattern.
      */
     void shadeAlternateRows(Range range, Fill fill) {
         alternateShadingRanges.add(new AlternateShading(range, getWorkbook().cacheDifferentialFormat(new DifferentialFormat(null, null, fill, null, null, null))));
     }
+
     /**
      * Apply shading to Nth rows in the given range.
      *
-     * @param range Range of cells.
-     * @param fill Shading fill pattern.
+     * @param range     Range of cells.
+     * @param fill      Shading fill pattern.
      * @param eachNRows Shading row frequency.
      */
     void shadeRows(Range range, Fill fill, int eachNRows) {
@@ -410,6 +412,7 @@ public class Worksheet implements Closeable {
      * Sets the visibility state of the sheet
      * <p>
      * This is done by setting the {@code state} attribute in the workbook.xml.
+     *
      * @param visibilityState New visibility state for this sheet.
      */
     public void setVisibilityState(VisibilityState visibilityState) {
@@ -468,6 +471,7 @@ public class Worksheet implements Closeable {
     /**
      * Protects the sheet with a password. This method protects all the default {@link SheetProtectionOption}s and
      * 'sheet'. (Note that this is not very secure and only meant for discouraging changes.)
+     *
      * @param password The password to use.
      */
     public void protect(String password) {
@@ -476,8 +480,9 @@ public class Worksheet implements Closeable {
 
     /**
      * Protects the sheet with a password. (Note that this is not very secure and only meant for discouraging changes.)
+     *
      * @param password The password to use.
-     * @param options An array of all the {@link SheetProtectionOption}s to protect.
+     * @param options  An array of all the {@link SheetProtectionOption}s to protect.
      */
     public void protect(String password, SheetProtectionOption... options) {
         final EnumSet<SheetProtectionOption> optionSet = EnumSet.noneOf(SheetProtectionOption.class);
@@ -487,8 +492,9 @@ public class Worksheet implements Closeable {
 
     /**
      * Protects the sheet with a password. (Note that this is not very secure and only meant for discouraging changes.)
+     *
      * @param password The password to use.
-     * @param options A {@link Set} of all the {@link SheetProtectionOption}s to protect.
+     * @param options  A {@link Set} of all the {@link SheetProtectionOption}s to protect.
      */
     public void protect(String password, Set<SheetProtectionOption> options) {
         if (password == null) {
@@ -502,8 +508,9 @@ public class Worksheet implements Closeable {
 
     /**
      * Applies autofilter specifically to the given cell range
-     * @param topRowNumber The first row (header) where filter will be initialized
-     * @param leftCellNumber Left cell number where filter will be initialized
+     *
+     * @param topRowNumber    The first row (header) where filter will be initialized
+     * @param leftCellNumber  Left cell number where filter will be initialized
      * @param bottomRowNumber The last row (containing values) that will be included
      * @param rightCellNumber Right cell number where filter will be initialized
      */
@@ -513,12 +520,13 @@ public class Worksheet implements Closeable {
 
     /**
      * Applies autofilter automatically based on provided header cells
-     * @param rowNumber Row number
-     * @param leftCellNumber Left cell number where filter will be initialized
+     *
+     * @param rowNumber       Row number
+     * @param leftCellNumber  Left cell number where filter will be initialized
      * @param rightCellNumber Right cell number where filter will be initialized
      */
     public void setAutoFilter(int rowNumber, int leftCellNumber, int rightCellNumber) {
-        setAutoFilter(rowNumber, leftCellNumber, this.rows.size()-1, rightCellNumber);
+        setAutoFilter(rowNumber, leftCellNumber, this.rows.size() - 1, rightCellNumber);
     }
 
     /**
@@ -530,6 +538,7 @@ public class Worksheet implements Closeable {
 
     /**
      * Hash the password.
+     *
      * @param password The password to hash.
      * @return The password hash as a hex string (2 bytes)
      */
@@ -575,7 +584,8 @@ public class Worksheet implements Closeable {
     /**
      * Specify the custom row height for a row
      * <p> The maximum value for row height is <b>409.5</b> </p>
-     * @param r Zero-based row number
+     *
+     * @param r      Zero-based row number
      * @param height New row height
      */
     public void rowHeight(int r, double height) {
@@ -588,77 +598,83 @@ public class Worksheet implements Closeable {
     /**
      * Set the cell value at the given coordinates.
      *
-     * @param r Zero-based row number.
-     * @param c Zero-based column number.
+     * @param r     Zero-based row number.
+     * @param c     Zero-based column number.
      * @param value Cell value.
      */
     public void value(int r, int c, String value) {
         cell(r, c).setValue(workbook, value);
     }
+
     /**
      * Set the cell value at the given coordinates.
      *
-     * @param r Zero-based row number.
-     * @param c Zero-based column number.
+     * @param r     Zero-based row number.
+     * @param c     Zero-based column number.
      * @param value Cell value.
      */
     public void value(int r, int c, Number value) {
         cell(r, c).setValue(value);
     }
+
     /**
      * Set the cell value at the given coordinates.
      *
-     * @param r Zero-based row number.
-     * @param c Zero-based column number.
+     * @param r     Zero-based row number.
+     * @param c     Zero-based column number.
      * @param value Cell value.
      */
     public void value(int r, int c, Boolean value) {
         cell(r, c).setValue(value);
     }
+
     /**
      * Set the cell value at the given coordinates.
      *
-     * @param r Zero-based row number.
-     * @param c Zero-based column number.
+     * @param r     Zero-based row number.
+     * @param c     Zero-based column number.
      * @param value Cell value. Note Excel timestamps do not carry
-     * any timezone information; {@link Date} values are converted to an Excel
-     * serial number with the system timezone. If you need a specific timezone,
-     * prefer passing a {@link ZonedDateTime}.
+     *              any timezone information; {@link Date} values are converted to an Excel
+     *              serial number with the system timezone. If you need a specific timezone,
+     *              prefer passing a {@link ZonedDateTime}.
      */
     public void value(int r, int c, Date value) {
         cell(r, c).setValue(value);
     }
+
     /**
      * Set the cell value at the given coordinates.
      *
-     * @param r Zero-based row number.
-     * @param c Zero-based column number.
+     * @param r     Zero-based row number.
+     * @param c     Zero-based column number.
      * @param value Cell value. Note Excel timestamps do not carry
-     * any timezone information; {@link Date} values are converted to an Excel
-     * serial number with the system timezone. If you need a specific timezone,
-     * prefer passing a {@link ZonedDateTime}.
+     *              any timezone information; {@link Date} values are converted to an Excel
+     *              serial number with the system timezone. If you need a specific timezone,
+     *              prefer passing a {@link ZonedDateTime}.
      */
     public void value(int r, int c, LocalDateTime value) {
         cell(r, c).setValue(value);
     }
+
     /**
      * Set the cell value at the given coordinates.
      *
-     * @param r Zero-based row number.
-     * @param c Zero-based column number.
+     * @param r     Zero-based row number.
+     * @param c     Zero-based column number.
      * @param value Cell value. Note Excel timestamps do not carry
-     * any timezone information; {@link Date} values are converted to an Excel
-     * serial number with the system timezone. If you need a specific timezone,
-     * prefer passing a {@link ZonedDateTime}.
+     *              any timezone information; {@link Date} values are converted to an Excel
+     *              serial number with the system timezone. If you need a specific timezone,
+     *              prefer passing a {@link ZonedDateTime}.
      */
     public void value(int r, int c, LocalDate value) {
         cell(r, c).setValue(value);
     }
+
     /**
      * Set the cell value at the given coordinates.
      *
-     * @param r Zero-based row number.
-     * @param c Zero-based column number.
+     * @param r     Zero-based row number.
+     * @param c     Zero-based column number.
      * @param value Cell value.
      */
     public void value(int r, int c, ZonedDateTime value) {
@@ -679,16 +695,16 @@ public class Worksheet implements Closeable {
         return cell == null ? null : cell.getValue();
     }
 
-    public void hyperlink(int r, int c,HyperLink hyperLink) {
-        value(r,c,hyperLink.getDisplayStr());
-        this.addHyperlink(new Location(r,c),hyperLink);
+    public void hyperlink(int r, int c, HyperLink hyperLink) {
+        value(r, c, hyperLink.getDisplayStr());
+        this.addHyperlink(new Location(r, c), hyperLink);
     }
 
     /**
      * Set the cell formula at the given coordinates.
      *
-     * @param r Zero-based row number.
-     * @param c Zero-based column number.
+     * @param r          Zero-based row number.
+     * @param c          Zero-based column number.
      * @param expression Cell formula expression.
      */
     public void formula(int r, int c, String expression) {
@@ -698,8 +714,8 @@ public class Worksheet implements Closeable {
     /**
      * Set the cell value at the given coordinates.
      *
-     * @param r Zero-based row number.
-     * @param c Zero-based column number.
+     * @param r     Zero-based row number.
+     * @param c     Zero-based column number.
      * @param value Cell value.
      */
     public void inlineString(int r, int c, String value) {
@@ -722,10 +738,10 @@ public class Worksheet implements Closeable {
      * to make sure {@code top} &lt;= {@code bottom} and {@code left} &lt;=
      * {@code right}.
      *
-     * @param top Top row.
-     * @param left Left column.
+     * @param top    Top row.
+     * @param left   Left column.
      * @param bottom Bottom row.
-     * @param right Right column.
+     * @param right  Right column.
      * @return Newly created range.
      */
     public Range range(int top, int left, int bottom, int right) {
@@ -735,7 +751,7 @@ public class Worksheet implements Closeable {
     /**
      * Write column definitions of this worksheet as an XML element.
      *
-     * @param w Output writer.
+     * @param w      Output writer.
      * @param maxCol Max number of columns.
      * @throws IOException If an I/O error occurs.
      */
@@ -750,7 +766,7 @@ public class Worksheet implements Closeable {
                 maxWidth = colWidths.get(c);
             } else {
                 for (int r = 0; r < rows.size(); ++r) {
-                    boolean isCellInMergedRanges = mergedMatrix.get(r,c);
+                    boolean isCellInMergedRanges = mergedMatrix.get(r, c);
                     // Exclude merged cells from computation && hidden rows
                     Object o = hiddenRows.contains(r) || isCellInMergedRanges ? null : value(r, c);
                     if (o != null && !(o instanceof Formula)) {
@@ -761,12 +777,12 @@ public class Worksheet implements Closeable {
             }
             boolean isHidden = hiddenColumns.contains(c);
             int groupLevel = groupColums.get(c);
-            if (maxWidth > 0 || isHidden||groupLevel!=0) {
+            if (maxWidth > 0 || isHidden || groupLevel != 0) {
                 if (!started) {
                     w.append("<cols>");
                     started = true;
                 }
-                writeCol(w, c, maxWidth, bestFit, isHidden,groupLevel);
+                writeCol(w, c, maxWidth, bestFit, isHidden, groupLevel);
             }
         }
         if (started) {
@@ -778,11 +794,11 @@ public class Worksheet implements Closeable {
     /**
      * Write a column as an XML element.
      *
-     * @param w Output writer.
+     * @param w           Output writer.
      * @param columnIndex Zero-based column number.
-     * @param maxWidth The maximum width
-     * @param bestFit Whether or not this column should be optimized for fit
-     * @param isHidden Whether or not this row is hidden
+     * @param maxWidth    The maximum width
+     * @param bestFit     Whether or not this column should be optimized for fit
+     * @param isHidden    Whether or not this row is hidden
      * @throws IOException If an I/O error occurs.
      */
     private static void writeCol(Writer w, int columnIndex, double maxWidth, boolean bestFit, boolean isHidden, int groupLevel) throws IOException {
@@ -806,14 +822,14 @@ public class Worksheet implements Closeable {
      */
     private static String getCellMark(int row, int coll) {
         char columnLetter = (char) ('A' + coll);
-        return String.valueOf(columnLetter) + String.valueOf(row+1);
+        return String.valueOf(columnLetter) + String.valueOf(row + 1);
     }
 
-	@Override
-	public void close() throws IOException {
-		finish();
-	}
-	
+    @Override
+    public void close() throws IOException {
+        finish();
+    }
+
     /**
      * Finish the construction of this worksheet. This creates the worksheet
      * file on the workbook's output stream. Rows and cells in this worksheet
@@ -852,7 +868,7 @@ public class Worksheet implements Closeable {
         }
         if (!conditionalFormattings.isEmpty()) {
             int priority = 1;
-            for (ConditionalFormatting v: conditionalFormattings) {
+            for (ConditionalFormatting v : conditionalFormattings) {
                 v.getConditionalFormattingRule().setPriority(priority++);
                 v.write(writer);
             }
@@ -865,7 +881,7 @@ public class Worksheet implements Closeable {
         }
         if (!dataValidations.isEmpty()) {
             writer.append("<dataValidations count=\"").append(dataValidations.size()).append("\">");
-            for (DataValidation v: dataValidations) {
+            for (DataValidation v : dataValidations) {
                 v.write(writer);
             }
             writer.append("</dataValidations>");
@@ -877,32 +893,32 @@ public class Worksheet implements Closeable {
                 Ref ref = hr.getValue();
                 String rId = relationships.setHyperLinkRels(hyperLink.getLinkStr(), "External");
                 writer.append("<hyperlink ");
-                writer.append("ref=\"" + ref.toString()+"\" ");
-                writer.append("r:id=\"" + rId +"\" ");
+                writer.append("ref=\"" + ref.toString() + "\" ");
+                writer.append("r:id=\"" + rId + "\" ");
                 writer.append("/>");
             }
             writer.append("</hyperlinks>");
         }
         /* set page margins for the print setup (see in print preview) */
         String margins = "<pageMargins bottom=\"" + bottomMargin +
-                         "\" footer=\"" + footerMargin +
-                         "\" header=\"" + headerMargin +
-                         "\" left=\"" + leftMargin +
-                         "\" right=\"" + rightMargin +
-                         "\" top=\"" + topMargin + "\"/>";
+                "\" footer=\"" + footerMargin +
+                "\" header=\"" + headerMargin +
+                "\" left=\"" + leftMargin +
+                "\" right=\"" + rightMargin +
+                "\" top=\"" + topMargin + "\"/>";
         writer.append(margins);
 
         /* set page orientation for the print setup */
         writer.append("<pageSetup")
-            .append(" paperSize=\"" + paperSize.xmlValue + "\"")
-            .append(" scale=\"" + pageScale + "\"")
-            .append(" fitToWidth=\"" + fitToWidth + "\"")
-            .append(" fitToHeight=\"" + fitToHeight + "\"")
-            .append(" firstPageNumber=\"" + firstPageNumber + "\"")
-            .append(" useFirstPageNumber=\"" + useFirstPageNumber.toString() + "\"")
-            .append(" blackAndWhite=\"" + blackAndWhite.toString() + "\"")
-            .append(" orientation=\"" + pageOrientation + "\"")
-            .append("/>");
+                .append(" paperSize=\"" + paperSize.xmlValue + "\"")
+                .append(" scale=\"" + pageScale + "\"")
+                .append(" fitToWidth=\"" + fitToWidth + "\"")
+                .append(" fitToHeight=\"" + fitToHeight + "\"")
+                .append(" firstPageNumber=\"" + firstPageNumber + "\"")
+                .append(" useFirstPageNumber=\"" + useFirstPageNumber.toString() + "\"")
+                .append(" blackAndWhite=\"" + blackAndWhite.toString() + "\"")
+                .append(" orientation=\"" + pageOrientation + "\"")
+                .append("/>");
 
         /* write to header and footer */
         writer.append("<headerFooter differentFirst=\"false\" differentOddEven=\"false\">");
@@ -918,14 +934,14 @@ public class Worksheet implements Closeable {
         writer.append("</oddFooter></headerFooter>");
 
 
-        if(!comments.isEmpty()) {
+        if (!comments.isEmpty()) {
             writer.append("<drawing r:id=\"d\"/>");
             writer.append("<legacyDrawing r:id=\"v\"/>");
         }
-        if (!tables.isEmpty()){
-            writer.append("<tableParts count=\""+tables.size()+"\">");
+        if (!tables.isEmpty()) {
+            writer.append("<tableParts count=\"" + tables.size() + "\">");
             for (Map.Entry<String, Table> entry : tables.entrySet()) {
-                writer.append("<tablePart r:id=\""+entry.getKey()+"\"/>");
+                writer.append("<tablePart r:id=\"" + entry.getKey() + "\"/>");
             }
             writer.append("</tableParts>");
         }
@@ -943,12 +959,12 @@ public class Worksheet implements Closeable {
         //write table files
         for (Map.Entry<String, Table> entry : tables.entrySet()) {
             Table table = entry.getValue();
-            workbook.writeFile("xl/tables/table" + table.index + ".xml",table::write);
+            workbook.writeFile("xl/tables/table" + table.index + ".xml", table::write);
         }
 
         // write relationship files
         if (!relationships.isEmpty()) {
-            workbook.writeFile("xl/worksheets/_rels/sheet"+index+".xml.rels",relationships::write);
+            workbook.writeFile("xl/worksheets/_rels/sheet" + index + ".xml.rels", relationships::write);
         }
         // Free memory; we no longer need this data
         rows.clear();
@@ -992,8 +1008,8 @@ public class Worksheet implements Closeable {
             final int nbCols = rows.stream().filter(Objects::nonNull).mapToInt(r -> r.length).max().orElse(0);
             final int maxHideCol = hiddenColumns.stream().mapToInt(a -> a).max().orElse(0);
             final int maxNoZeroIndex = groupColums.getMaxNoZeroIndex();
-            if (nbCols > 0 || !hiddenColumns.isEmpty()||maxNoZeroIndex!=-1) {
-                int maxCol = Math.max(nbCols, Math.max(maxHideCol,maxNoZeroIndex) + 1) ;
+            if (nbCols > 0 || !hiddenColumns.isEmpty() || maxNoZeroIndex != -1) {
+                int maxCol = Math.max(nbCols, Math.max(maxHideCol, maxNoZeroIndex) + 1);
                 writeCols(writer, maxCol);
             }
             writer.append("<sheetData>");
@@ -1001,14 +1017,14 @@ public class Worksheet implements Closeable {
         final int nbRows = rows.size();
         final int maxHideRow = hiddenRows.stream().mapToInt(a -> a).max().orElse(0);
         final int maxGroupRow = groupRows.getMaxNoZeroIndex();
-        final int maxRow = Math.max(nbRows, Math.max(maxGroupRow,maxHideRow) + 1);
+        final int maxRow = Math.max(nbRows, Math.max(maxGroupRow, maxHideRow) + 1);
         for (int r = flushedRows; r < maxRow; ++r) {
             boolean notEmptyRow = r < rows.size();
             Cell[] row = notEmptyRow ? rows.get(r) : null;
             boolean isHidden = hiddenRows.contains(r);
             byte groupLevel = groupRows.get(r);
             if (row != null || isHidden || groupLevel != 0) {
-                writeRow(writer, r, isHidden,groupLevel,
+                writeRow(writer, r, isHidden, groupLevel,
                         rowHeights.get(r), row);
             }
             if (notEmptyRow) {
@@ -1025,36 +1041,36 @@ public class Worksheet implements Closeable {
      * Writes corresponding pane definitions into XML and freezes pane.
      */
     private void writeFreezePane(Writer w) throws IOException {
-        String activePane = freezeLeftColumns==0 ? "bottomLeft" : freezeTopRows==0 ? "topRight" : "bottomRight";
+        String activePane = freezeLeftColumns == 0 ? "bottomLeft" : freezeTopRows == 0 ? "topRight" : "bottomRight";
         String freezePane = "<pane xSplit=\"" + freezeLeftColumns +
-                            "\" ySplit=\"" + freezeTopRows + "\" topLeftCell=\"" +
-                            getCellMark(freezeTopRows, freezeLeftColumns) +
-                            "\" activePane=\"" + activePane + "\" state=\"frozen\"/>";
+                "\" ySplit=\"" + freezeTopRows + "\" topLeftCell=\"" +
+                getCellMark(freezeTopRows, freezeLeftColumns) +
+                "\" activePane=\"" + activePane + "\" state=\"frozen\"/>";
         w.append(freezePane);
         String topLeftPane = "<selection pane=\"topLeft\" activeCell=\"" +
-                             getCellMark(0, 0) +
-                             "\" activeCellId=\"0\" sqref=\"" +
-                             getCellMark(0, 0) + "\"/>";
+                getCellMark(0, 0) +
+                "\" activeCellId=\"0\" sqref=\"" +
+                getCellMark(0, 0) + "\"/>";
         w.append(topLeftPane);
         if (freezeLeftColumns != 0) {
             String topRightPane = "<selection pane=\"topRight\" activeCell=\"" +
-                                  getCellMark(0, freezeLeftColumns) +
-                                  "\" activeCellId=\"0\" sqref=\"" +
-                                  getCellMark(0, freezeLeftColumns) + "\"/>";
+                    getCellMark(0, freezeLeftColumns) +
+                    "\" activeCellId=\"0\" sqref=\"" +
+                    getCellMark(0, freezeLeftColumns) + "\"/>";
             w.append(topRightPane);
         }
-        if (freezeTopRows !=0 ) {
+        if (freezeTopRows != 0) {
             String bottomLeftPane = "<selection pane=\"bottomLeft\" activeCell=\"" +
-                                    getCellMark(freezeTopRows, 0) +
-                                    "\" activeCellId=\"0\" sqref=\"" +
-                                    getCellMark(freezeTopRows, 0) + "\"/>";
+                    getCellMark(freezeTopRows, 0) +
+                    "\" activeCellId=\"0\" sqref=\"" +
+                    getCellMark(freezeTopRows, 0) + "\"/>";
             w.append(bottomLeftPane);
         }
         if (freezeLeftColumns != 0 && freezeTopRows != 0) {
             String bottomRightPane = "<selection pane=\"bottomRight\" activeCell=\"" +
-                                     getCellMark(freezeTopRows, freezeLeftColumns) +
-                                     "\" activeCellId=\"0\" sqref=\"" +
-                                     getCellMark(freezeTopRows, freezeLeftColumns) + "\"/>";
+                    getCellMark(freezeTopRows, freezeLeftColumns) +
+                    "\" activeCellId=\"0\" sqref=\"" +
+                    getCellMark(freezeTopRows, freezeLeftColumns) + "\"/>";
             w.append(bottomRightPane);
         }
     }
@@ -1062,33 +1078,33 @@ public class Worksheet implements Closeable {
     /**
      * Write a row as an XML element.
      *
-     * @param w Output writer.
-     * @param r Zero-based row number.
-     * @param isHidden Whether or not this row is hidden
+     * @param w          Output writer.
+     * @param r          Zero-based row number.
+     * @param isHidden   Whether or not this row is hidden
      * @param groupLevel Group level of row
-     * @param rowHeight Row height value in points to be set if customHeight is true
-     * @param row Cells in the row.
+     * @param rowHeight  Row height value in points to be set if customHeight is true
+     * @param row        Cells in the row.
      * @throws IOException If an I/O error occurs.
      */
-    private static void writeRow(Writer w, int r, boolean isHidden,byte groupLevel,
+    private static void writeRow(Writer w, int r, boolean isHidden, byte groupLevel,
                                  Double rowHeight, Cell... row) throws IOException {
         w.append("<row r=\"").append(r + 1).append("\"");
         if (isHidden) {
             w.append(" hidden=\"true\"");
         }
-        if(rowHeight != null) {
+        if (rowHeight != null) {
             w.append(" ht=\"")
-             .append(rowHeight)
-             .append("\"")
-             .append(" customHeight=\"1\"");
+                    .append(rowHeight)
+                    .append("\"")
+                    .append(" customHeight=\"1\"");
         }
-        if (groupLevel!=0){
+        if (groupLevel != 0) {
             w.append(" outlineLevel=\"")
                     .append(groupLevel)
                     .append("\"");
         }
         w.append(">");
-        if (null!=row) {
+        if (null != row) {
             for (int c = 0; c < row.length; ++c) {
                 if (row[c] != null) {
                     row[c].write(w, r, c);
@@ -1103,8 +1119,9 @@ public class Worksheet implements Closeable {
      * The comment popup will be twice the size of the cell and will be initially hidden.
      * <p>
      * Comments are stored in memory till call to {@link #close()} (or  the old fashion way {@link #finish()}) - calling {@link #flush()} does not write them to output stream.
-     * @param r Zero-based row number.
-     * @param c Zero-based column number.
+     *
+     * @param r       Zero-based row number.
+     * @param c       Zero-based column number.
      * @param comment Note text
      */
     public void comment(int r, int c, String comment) {
@@ -1120,12 +1137,13 @@ public class Worksheet implements Closeable {
 
     /**
      * Set sheet view zoom level in percent. Default is 100 (100%).
+     *
      * @param zoomPercent - zoom level from 10 to 400
      */
     public void setZoom(int zoomPercent) {
         if (10 <= zoomPercent && zoomPercent <= 400) {
             this.zoomScale = zoomPercent;
-        }else{
+        } else {
             throw new IllegalArgumentException("zoom must be within 10 and 400 inclusive");
         }
     }
@@ -1140,8 +1158,9 @@ public class Worksheet implements Closeable {
 
     /**
      * Set freeze pane (rows and columns that remain when scrolling).
+     *
      * @param nLeftColumns - number of columns from the left that will remain frozen
-     * @param nTopRows - number of rows from the top that will remain frozen
+     * @param nTopRows     - number of rows from the top that will remain frozen
      */
     public void freezePane(int nLeftColumns, int nTopRows) {
         this.freezeLeftColumns = nLeftColumns;
@@ -1158,6 +1177,7 @@ public class Worksheet implements Closeable {
 
     /**
      * Set header margin.
+     *
      * @param margin - header margin in inches
      */
     public void headerMargin(float margin) {
@@ -1166,6 +1186,7 @@ public class Worksheet implements Closeable {
 
     /**
      * Set footer margin.
+     *
      * @param margin - footer page margin in inches
      */
     public void footerMargin(float margin) {
@@ -1174,6 +1195,7 @@ public class Worksheet implements Closeable {
 
     /**
      * Set top margin.
+     *
      * @param margin - top page margin in inches
      */
     public void topMargin(float margin) {
@@ -1182,6 +1204,7 @@ public class Worksheet implements Closeable {
 
     /**
      * Set bottom margin.
+     *
      * @param margin - bottom page margin in inches
      */
     public void bottomMargin(float margin) {
@@ -1190,6 +1213,7 @@ public class Worksheet implements Closeable {
 
     /**
      * Set left margin.
+     *
      * @param margin - left page margin in inches
      */
     public void leftMargin(float margin) {
@@ -1198,6 +1222,7 @@ public class Worksheet implements Closeable {
 
     /**
      * Set right margin.
+     *
      * @param margin - right page margin in inches
      */
     public void rightMargin(float margin) {
@@ -1206,25 +1231,29 @@ public class Worksheet implements Closeable {
 
     /**
      * Set the page orientation.
+     *
      * @param orientation New page orientation for this worksheet
      */
     public void pageOrientation(String orientation) {
         this.pageOrientation = orientation;
     }
+
     /**
      * Set the paper size.
+     *
      * @param size New paper size for this worksheet
      */
     public void paperSize(PaperSize size) {
         this.paperSize = size;
     }
+
     /**
      * @param scale = scaling factor for the print setup (between 1 and 100)
-     *
      */
     public void pageScale(int scale) {
         this.pageScale = scale;
     }
+
     /**
      * @param pageNumber - first page number (default: 0)
      */
@@ -1246,6 +1275,7 @@ public class Worksheet implements Closeable {
     public void printInBlackAndWhite() {
         this.blackAndWhite = true;
     }
+
     public void printInColor() {
         this.blackAndWhite = false;
     }
@@ -1268,7 +1298,8 @@ public class Worksheet implements Closeable {
 
     /**
      * Set footer text.
-     * @param text - text input form or custom text
+     *
+     * @param text     - text input form or custom text
      * @param position - Position.LEFT/RIGHT/CENTER enum
      */
     public void footer(String text, Position position) {
@@ -1277,55 +1308,60 @@ public class Worksheet implements Closeable {
 
     /**
      * Set footer text with specified font size.
-     * @param text - text input form or custom text
+     *
+     * @param text     - text input form or custom text
      * @param position - Position.LEFT/RIGHT/CENTER enum
      * @param fontSize - integer describing font size
      */
     public void footer(String text, Position position, int fontSize) {
         this.footer.put(position, new MarginalInformation(text, position)
-            .withFontSize(fontSize));
+                .withFontSize(fontSize));
     }
 
     /**
      * Set footer text with specified font and size.
-     * @param text - text input form or custom text
+     *
+     * @param text     - text input form or custom text
      * @param position - Position.LEFT/RIGHT/CENTER enum
      * @param fontName - font name (e.g., "Arial")
      * @param fontSize - integer describing font size
      */
     public void footer(String text, Position position, String fontName, int fontSize) {
         this.footer.put(position, new MarginalInformation(text, position)
-            .withFont(fontName)
-            .withFontSize(fontSize));
+                .withFont(fontName)
+                .withFontSize(fontSize));
     }
 
     /**
      * Set header text.
-     * @param text - text input form or custom text
+     *
+     * @param text     - text input form or custom text
      * @param position - Position.LEFT/RIGHT/CENTER enum
      * @param fontName - font name (e.g., "Arial")
      * @param fontSize - integer describing font size
      */
     public void header(String text, Position position, String fontName, int fontSize) {
         this.header.put(position, new MarginalInformation(text, position)
-            .withFont(fontName)
-            .withFontSize(fontSize));
+                .withFont(fontName)
+                .withFontSize(fontSize));
     }
 
     /**
      * Set header text with specified font size.
-     * @param text - text input form or custom text
+     *
+     * @param text     - text input form or custom text
      * @param position - Position.LEFT/RIGHT/CENTER enum
      * @param fontSize - integer describing font size
      */
     public void header(String text, Position position, int fontSize) {
         this.header.put(position, new MarginalInformation(text, position)
-            .withFontSize(fontSize));
+                .withFontSize(fontSize));
     }
 
     /**
      * Set header text with specified font and size.
-     * @param text - text input form or custom text
+     *
+     * @param text     - text input form or custom text
      * @param position - Position.LEFT/RIGHT/CENTER enum
      */
     public void header(String text, Position position) {
@@ -1339,8 +1375,7 @@ public class Worksheet implements Closeable {
      * cell range dropdown menu under the specified name.
      *
      * @param range Range of cells that needs to be named.
-     * @param name String representing the given cell range's name.
-     *
+     * @param name  String representing the given cell range's name.
      */
     public void addNamedRange(Range range, String name) {
         this.namedRanges.put(name, range);
@@ -1364,11 +1399,11 @@ public class Worksheet implements Closeable {
         }
     }
 
-    public void groupCols(int from , int to) {
-        IntStream.rangeClosed(Math.min(from,to),Math.max(from,to)).forEach(groupColums::increase);
+    public void groupCols(int from, int to) {
+        IntStream.rangeClosed(Math.min(from, to), Math.max(from, to)).forEach(groupColums::increase);
     }
 
-    public void groupRows(int from , int to) {
-        IntStream.rangeClosed(Math.min(from,to),Math.max(from,to)).forEach(groupRows::increase);
+    public void groupRows(int from, int to) {
+        IntStream.rangeClosed(Math.min(from, to), Math.max(from, to)).forEach(groupRows::increase);
     }
 }

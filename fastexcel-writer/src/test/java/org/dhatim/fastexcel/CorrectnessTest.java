@@ -105,30 +105,30 @@ class CorrectnessTest {
 
     @Test
     void exceedMaxRows() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            writeWorkbook(wb -> wb.newWorksheet("Worksheet 1").value(Worksheet.MAX_ROWS, 0, "test"));
-        });
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                writeWorkbook(wb -> wb.newWorksheet("Worksheet 1").value(Worksheet.MAX_ROWS, 0, "test")));
+        assertThat(exception).hasMessageContaining("Cell coordinate (1048576,0) out of range");
     }
 
     @Test
     void negativeRow() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            writeWorkbook(wb -> wb.newWorksheet("Worksheet 1").value(-1, 0, "test"));
-        });
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                writeWorkbook(wb -> wb.newWorksheet("Worksheet 1").value(-1, 0, "test")));
+        assertThat(exception).hasMessageContaining("Cell coordinate (-1,0) out of range");
     }
 
     @Test
     void exceedMaxCols() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            writeWorkbook(wb -> wb.newWorksheet("Worksheet 1").value(0, Worksheet.MAX_COLS, "test"));
-        });
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                writeWorkbook(wb -> wb.newWorksheet("Worksheet 1").value(0, Worksheet.MAX_COLS, "test")));
+        assertThat(exception).hasMessageContaining("Cell coordinate (0,16384) out of range");
     }
 
     @Test
     void negativeCol() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            writeWorkbook(wb -> wb.newWorksheet("Worksheet 1").value(0, -1, "test"));
-        });
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                writeWorkbook(wb -> wb.newWorksheet("Worksheet 1").value(0, -1, "test")));
+        assertThat(exception).hasMessageContaining("Cell coordinate (0,-1) out of range");
     }
 
     @Test
@@ -391,11 +391,11 @@ class CorrectnessTest {
             ws.range(0, 0, 5, 2).createTable();
 
             //group
-            ws.groupRows(3,4);
-            ws.groupRows(2,5);
+            ws.groupRows(3, 4);
+            ws.groupRows(2, 5);
 
-            ws.groupCols(6,7);
-            ws.groupCols(4,8);
+            ws.groupCols(6, 7);
+            ws.groupCols(4, 8);
         });
 
         //fileOutputStream.write(bytes);
@@ -539,23 +539,23 @@ class CorrectnessTest {
         //try (FileOutputStream fileOutputStream = new FileOutputStream("D://group_cols_test.xlsx")) {
         byte[] bytes = writeWorkbook(wb -> {
             Worksheet ws = wb.newWorksheet("Worksheet 1");
-            ws.value(1,1,"tt");
-            ws.value(1,2,"tt");
-            ws.value(1,3,"tt");
-            ws.value(1,4,"tt");
-            ws.value(1,5,"tt");
+            ws.value(1, 1, "tt");
+            ws.value(1, 2, "tt");
+            ws.value(1, 3, "tt");
+            ws.value(1, 4, "tt");
+            ws.value(1, 5, "tt");
 
-            ws.value(1,0,"cc");
-            ws.value(2,0,"cc");
-            ws.value(3,0,"cc");
-            ws.value(4,0,"cc");
-            ws.value(5,0,"cc");
+            ws.value(1, 0, "cc");
+            ws.value(2, 0, "cc");
+            ws.value(3, 0, "cc");
+            ws.value(4, 0, "cc");
+            ws.value(5, 0, "cc");
 
-            ws.groupCols(2,3);
-            ws.groupCols(1,5);
+            ws.groupCols(2, 3);
+            ws.groupCols(1, 5);
 
-            ws.groupRows(2,3);
-            ws.groupRows(1,5);
+            ws.groupRows(2, 3);
+            ws.groupRows(1, 5);
 
         });
         //fileOutputStream.write(bytes);
